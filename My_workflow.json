@@ -1,0 +1,166 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "823b965d-4f85-42ed-8b6e-fd7f6c733438",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "85a458e8-ba27-4277-8a90-4c7a076df2e1",
+              "name": "topic",
+              "value": "Free webinar: How mid-size retailers cut returns by 30% using AI demand forecasting",
+              "type": "string"
+            },
+            {
+              "id": "720885a9-c6d0-4474-90a8-d7e158e129b2",
+              "name": "audience",
+              "value": "Operations and supply-chain managers at mid-size retail companies",
+              "type": "string"
+            },
+            {
+              "id": "9abd746d-0d34-4916-8856-b80526b9a306",
+              "name": "tone",
+              "value": "Professional, credible, benefit-led — specific numbers, no fluff",
+              "type": "string"
+            },
+            {
+              "id": "04bda189-9da1-445c-a7c7-20107122260d",
+              "name": "channel",
+              "value": "Marketing email (subject line + body + clear CTA)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d601eeea-c255-4772-af94-93fb3e5e6246",
+      "name": "Brief"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a B2B email copywriter. You write marketing emails that get opened and clicked.\n\nAlways return exactly three parts clearly labelled:\nSUBJECT LINE\nBODY\nCTA\n\nRules:\n- The subject line must be under 60 characters.\n- The body must be under 80 words.\n- Start the body with a concrete business problem or question.\n- Use the exact number from the topic once.\n- Do not invent facts, dates, company names, speakers, or extra statistics.\n- Never use these phrases: leverage, seamless, game-changer, revolutionary, unlock, in today’s fast-paced world.\n- Use short sentences.\n- The CTA must be one clear action.\n\nReturn only the three labelled parts."
+            },
+            {
+              "content": "=Write a {{ $json.channel }} for the topic: {{ $json.topic }}.\nAudience: {{ $json.audience }}.\nTone: {{ $json.tone }}.\nUse the specific number in the topic.\nReturn subject line, body, and CTA, each clearly labelled."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        432,
+        0
+      ],
+      "id": "dfed4ba0-4caa-4771-98de-bb3da5d54a79",
+      "name": "AI Draft",
+      "credentials": {
+        "openAiApi": {
+          "id": "9qnJUOPbNwSn8Yq6",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ilyasheva.irina@gmail.com",
+        "subject": "n8n Task 3 — Topic 2 B2B SaaS webinar email",
+        "emailType": "text",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "b56adccd-b461-411a-b3a1-afd22982f429",
+      "name": "Delivery",
+      "webhookId": "bf61563e-faa7-4185-8f38-9d372920c2d3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "75X9PJE7yaY9lfSa",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brief": {
+      "main": [
+        [
+          {
+            "node": "AI Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Draft": {
+      "main": [
+        [
+          {
+            "node": "Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e10ce100-219a-464c-958d-e84840fac4f5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "06de5dc527d63f1d2ec1dfc45e08568c3a69b0d7f66ccfd8b92af16396227af8"
+  },
+  "id": "EKhDwLtyBL14Qse1",
+  "tags": []
+}
